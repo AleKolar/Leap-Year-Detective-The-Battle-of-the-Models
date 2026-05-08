@@ -275,6 +275,29 @@
         document.getElementById('winnerMsg').innerHTML = msg;
     }
 
+    async function downloadLastResult() {
+        try {
+            const resp = await fetch('/api/llm-arena/last-result');
+            if (!resp.ok) {
+                alert('Нет сохранённых результатов. Сначала проведите битву!');
+                return;
+            }
+            const data = await resp.json();
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `battle_result_${data.id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            console.error(e);
+            alert('Ошибка при скачивании');
+        }
+    }
+
     window.onload = loadStats;
 </script>
 </body>

@@ -1,14 +1,19 @@
-from fastapi import APIRouter, Request, HTTPException, Depends
+# src/routers/llm_arena.py
+
+from fastapi import APIRouter, Request, HTTPException, Depends, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+
+from src.models.db_models import ArenaResult
 from src.models.models import CompareRequest, WinnerResponse, BattleHistoryResponse
 from src.services.ai_service import (
     run_arena_comparison, judge_winner,
     DEFAULT_MODELS, AVAILABLE_MODELS
 )
 from src.database.database import get_async_db
-from src.models.db_models import ArenaResult
+from src.services.arena_result import get_last_result_service
+from src.utils.normalize import to_md
 
 router = APIRouter(prefix="/api/llm-arena", tags=["LLM Arena"])
 
@@ -82,3 +87,29 @@ async def get_history(db: AsyncSession = Depends(get_async_db)):
     result = await db.execute(stmt)
     battles = result.scalars().all()
     return battles
+
+# @router.get("/last-result")
+# async def get_last_result(db: AsyncSession = Depends(get_async_db)):
+#     last_battle = await get_last_result_service(db)
+#
+#     if not last_battle:
+#         raise HTTPException(404, "История битв пуста")
+#
+#     return last_battle
+
+@router.get("/last-result")
+async def get_last_result(db: AsyncSession = Depends(get_async_db)):
+    last_battle = await get_last_result_service(db)
+
+    if not last_battle:
+        raise HTTPException(404, "История битв пуста")
+
+    markdown = to_md(last_battle.evidence)
+
+    return Response(
+        content=markdown,
+        media_type="text/markdown",
+        headers={
+            "Content-Disposition": "attachment; filename=last_result.md"
+        }
+    )

@@ -210,6 +210,7 @@
             <div id="arenaTiming" style="margin-top:5px; color:#718096;"></div>
             <button onclick="declareWinner()" style="background:#e53e3e;">👑 Определить победителя</button>
             <div id="winnerMsg" class="winner-msg"></div>
+            <button onclick="downloadLastResult()" style="background:#718096;">📥 Скачать результат</button>
         </div>
     </div>
 </div>
@@ -295,6 +296,35 @@
             msg += '</ul>';
         }
         document.getElementById('winnerMsg').innerHTML = msg;
+    }
+
+    async function downloadLastResult() {
+        try {
+            const resp = await fetch('/api/llm-arena/last-result');
+
+            if (!resp.ok) {
+                alert('Ошибка при скачивании');
+                return;
+            }
+
+            const blob = await resp.blob(); // ❗ ВАЖНО
+
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+
+            a.href = url;
+            a.download = 'last_result.md';
+
+            document.body.appendChild(a);
+            a.click();
+
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+        } catch (e) {
+            console.error(e);
+            alert('Ошибка при скачивании');
+        }
     }
 
     window.onload = loadStats;

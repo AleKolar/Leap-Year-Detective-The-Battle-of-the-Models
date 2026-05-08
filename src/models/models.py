@@ -30,7 +30,6 @@ class WinnerResponse(BaseModel):
     evidence: list[ModelEvidence] = []
 
 class BattleHistoryResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True) # теперь так !
 
     id: int
     model1: str
@@ -38,6 +37,8 @@ class BattleHistoryResponse(BaseModel):
     winner: Optional[str] = None
     message: str
     created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)  # теперь так !
 
     # class Config:
     #     from_attributes = True # Устарел --> Предупреждение !
