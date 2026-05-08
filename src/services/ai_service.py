@@ -9,9 +9,17 @@ load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 AVAILABLE_MODELS = {
+    # Старые (проверенные)
     "gpt-4o-mini": "openai/gpt-4o-mini",
     "deepseek-chat": "deepseek/deepseek-chat",
     "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
+
+    # Новые (Оч.сильные)
+    "qwen3-coder-480b": "qwen/qwen3-coder-480b-a35b-instruct:free",
+    "llama-3.3-70b": "meta-llama/llama-3.3-70b-instruct:free",
+
+    # Средние (не проверенные)
+    "llama-3.2-3b": "meta-llama/llama-3.2-3b-instruct:free",
 }
 
 DEFAULT_MODELS = ["gpt-4o-mini", "deepseek-chat"]
@@ -72,6 +80,42 @@ async def compare_models(
     return {"results": results}
 
 
+def analyze_tests(code: str) -> dict:
+    """Оценивает качество тестов на основе покрытия ключевых случаев и стиля."""
+
+    # Количество assert
+    num_asserts = len(re.findall(r'\bassert\b', code))
+
+    # Проверка наличия тестов для ключевых годов
+    has_1900 = bool(re.search(r'\b1900\b', code))
+    has_2000 = bool(re.search(r'\b2000\b', code))
+    has_2100 = bool(re.search(r'\b2100\b', code))
+    has_negative = bool(re.search(r'-\d{1,4}(?!\d)', code))  # отрицательный год
+    has_typical_leap = bool(re.search(r'\b(2024|2020|2004)\b', code))  # любой типичный високосный
+    has_typical_common = bool(re.search(r'\b(2023|2021|2003)\b', code))  # любой типичный невисокосный
+
+    # Бонус за стиль: сообщения в ассертах
+    has_assert_messages = bool(re.search(r'assert .+,\s*["\']', code))
+
+    # Суммарный охват ключевых случаев
+    coverage_points = sum([
+        has_1900, has_2000, has_2100, has_negative,
+        has_typical_leap, has_typical_common
+    ])
+
+    return {
+        "num_asserts": num_asserts,
+        "has_1900": has_1900,
+        "has_2000": has_2000,
+        "has_2100": has_2100,
+        "has_negative": has_negative,
+        "has_typical_leap": has_typical_leap,
+        "has_typical_common": has_typical_common,
+        "has_assert_messages": has_assert_messages,
+        "coverage_points": coverage_points,
+    }
+
+
 def judge_winner(results: List[dict]) -> dict:
     winners, losers = [], []
     evidence = []
@@ -81,31 +125,50 @@ def judge_winner(results: List[dict]) -> dict:
         code = res.get("content", "")
         model = res.get("model", "unknown")
         match = pattern.search(code)
-        if match:
+        found_rule = bool(match)
+        snippet = match.group(0) if match else ""
+        test_stats = analyze_tests(code)
+
+        evidence.append({
+            "model": model,
+            "found_rule": found_rule,
+            "snippet": snippet,
+            **test_stats
+        })
+
+        if found_rule:
             winners.append(model)
-            evidence.append({
-                "model": model,
-                "found_rule": True,
-                "snippet": match.group(0)  # сам совпавший фрагмент
-            })
         else:
             losers.append(model)
-            evidence.append({
-                "model": model,
-                "found_rule": False,
-                "snippet": ""
-            })
 
-    # победитель определяется как и раньше
-    if len(winners) == 1:
-        msg = f"🏆 Победитель: {winners[0]}! Учтено правило 400."
-    elif len(winners) > 1:
-        msg = f"🤝 Ничья! Модели {', '.join(winners)} справились."
-    else:
+    if not winners:
         msg = f"😞 Все проиграли: {', '.join(losers)}. Никто не учёл правило 400."
+        final_winners = []
+    elif len(winners) == 1:
+        msg = f"🏆 Победитель: {winners[0]}! Учтено правило 400."
+        final_winners = [winners[0]]
+    else:
+        # Ничья по функции – сравниваем тесты
+        winner_ev = [e for e in evidence if e["model"] in winners]
+        # Сортировка: сначала по coverage_points (больше – лучше), потом по стилю
+        best = sorted(winner_ev, key=lambda e: (
+            e["coverage_points"],
+            e["has_assert_messages"],
+            e["num_asserts"]
+        ), reverse=True)
+
+        if (best[0]["coverage_points"] > best[1]["coverage_points"]) or \
+           (best[0]["coverage_points"] == best[1]["coverage_points"] and
+            best[0]["has_assert_messages"] and not best[1]["has_assert_messages"]):
+            champ = best[0]["model"]
+            msg = f"🏆 По функции ничья, но {champ} побеждает за счёт лучших тестов! (покрытие: {best[0]['coverage_points']}/6)"
+            final_winners = [champ]
+        else:
+            msg = f"🤝 Абсолютная ничья! Модели {', '.join(winners)} справились с задачей и тестами."
+            final_winners = winners
 
     return {
-        "winners": winners,
+        "winners": final_winners,
         "losers": losers,
         "message": msg,
         "evidence": evidence
