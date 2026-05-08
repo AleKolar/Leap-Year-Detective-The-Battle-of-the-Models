@@ -8,7 +8,7 @@ import logging
 from sqlalchemy import text
 from starlette.staticfiles import StaticFiles
 
-from src.database.database import sync_engine, async_engine
+from src.database.database import async_engine
 from src.routers import leap_year, llm_arena
 from src.services.ai_service import API_KEY
 
