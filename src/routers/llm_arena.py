@@ -13,7 +13,7 @@ from src.services.ai_service import (
 )
 from src.database.database import get_async_db
 from src.services.arena_result import get_last_result_service
-from src.utils.normalize import to_md
+from src.utils.normalize import normalize_evidence, to_md
 
 router = APIRouter(prefix="/api/llm-arena", tags=["LLM Arena"])
 
@@ -104,7 +104,20 @@ async def get_last_result(db: AsyncSession = Depends(get_async_db)):
     if not last_battle:
         raise HTTPException(404, "История битв пуста")
 
-    markdown = to_md(last_battle.evidence)
+    # 1. нормализуем сырые данные из БД
+    evidence = normalize_evidence(last_battle.evidence)
+
+    # 2. превращаем evidence в markdown-блок
+    evidence_md = to_md(evidence)
+
+    # 3. собираем итоговый markdown документ
+    markdown = (
+        f"# 🧠 LLM Arena Result\n\n"
+        f"## 🏆 Result\n{last_battle.message}\n\n"
+        f"---\n\n"
+        f"## 📊 Evidence\n\n"
+        f"{evidence_md}"
+    )
 
     return Response(
         content=markdown,
