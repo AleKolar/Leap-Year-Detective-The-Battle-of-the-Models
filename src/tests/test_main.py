@@ -38,8 +38,8 @@ def test_check_year(client):
 def test_check_1900(client):
     resp = client.get("/api/check/1900")
     data = resp.json()
-    assert data["is_leap"] == False
-    assert data["rule_check"]["divisible_by_100"] == True
+    assert not data["is_leap"]
+    assert data["rule_check"]["divisible_by_100"]
 
 def test_stats(client):
     resp = client.get("/api/stats")

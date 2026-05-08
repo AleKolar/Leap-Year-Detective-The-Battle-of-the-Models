@@ -1,7 +1,7 @@
 # src/database/database.py
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase
 
 # Синхронный движок – исключительно для Alembic и тестов
 SYNC_DATABASE_URL = "sqlite:///./arena_history.db"
