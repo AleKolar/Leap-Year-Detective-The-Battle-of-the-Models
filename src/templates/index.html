@@ -120,11 +120,19 @@
     }
 
     async function declareWinner() {
-    const resp = await fetch('/api/llm-arena/winner', {
-        method: 'POST'
-    });
+    const resp = await fetch('/api/llm-arena/winner', { method: 'POST' });
     const data = await resp.json();
-    document.getElementById('winnerMsg').innerText = data.message;
+    let msg = `<p>${data.message}</p>`;
+    if (data.evidence) {
+        msg += '<ul>';
+        data.evidence.forEach(e => {
+            msg += `<li><strong>${e.model}</strong>: ${e.found_rule ? '✅ Нашла правило' : '❌ Не нашла'}`;
+            if (e.snippet) msg += ` → <code>${e.snippet}</code>`;
+            msg += '</li>';
+        });
+        msg += '</ul>';
+    }
+    document.getElementById('winnerMsg').innerHTML = msg;
     }
 
     window.onload = loadStats;

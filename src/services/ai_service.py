@@ -9,9 +9,16 @@ load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 AVAILABLE_MODELS = {
-    "gpt-4o-mini": "openai/gpt-4o-mini",
-    "deepseek-chat": "deepseek/deepseek-chat",
-    "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
+    # Сильные
+    "gemma-4-26b": "google/gemma-4-26b-a4b-it:free",
+    "nemotron-3": "nvidia/nemotron-3-super:free",
+
+    # Средние
+    "qwen3.5-flash": "qwen/qwen3.5-flash:free",
+    "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct:free",
+
+    # Вроде бы слабая модель
+    "nemotron-embed": "nvidia/llama-nemotron-embed-vl-1b-v2:free",
 }
 
 DEFAULT_MODELS = ["gpt-4o-mini", "deepseek-chat"]
@@ -71,16 +78,32 @@ async def compare_models(
     results = await asyncio.gather(*tasks)
     return {"results": results}
 
+
 def judge_winner(results: List[dict]) -> dict:
     winners, losers = [], []
+    evidence = []
+    pattern = re.compile(r'(year\s*%\s*400\s*==\s*0|not\s+year\s*%\s*400|year\s*%\s*400\b)')
+
     for res in results:
         code = res.get("content", "")
         model = res.get("model", "unknown")
-        if re.search(r'year\s*%\s*400\s*==\s*0|not\s+year\s*%\s*400|year\s*%\s*400\b', code):
+        match = pattern.search(code)
+        if match:
             winners.append(model)
+            evidence.append({
+                "model": model,
+                "found_rule": True,
+                "snippet": match.group(0)  # сам совпавший фрагмент
+            })
         else:
             losers.append(model)
+            evidence.append({
+                "model": model,
+                "found_rule": False,
+                "snippet": ""
+            })
 
+    # победитель определяется как и раньше
     if len(winners) == 1:
         msg = f"🏆 Победитель: {winners[0]}! Учтено правило 400."
     elif len(winners) > 1:
@@ -88,4 +111,9 @@ def judge_winner(results: List[dict]) -> dict:
     else:
         msg = f"😞 Все проиграли: {', '.join(losers)}. Никто не учёл правило 400."
 
-    return {"winners": winners, "losers": losers, "message": msg}
+    return {
+        "winners": winners,
+        "losers": losers,
+        "message": msg,
+        "evidence": evidence
+    }
