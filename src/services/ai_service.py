@@ -1,6 +1,8 @@
 import os
 import re
 import asyncio
+import time
+
 import aiohttp
 from dotenv import load_dotenv
 from typing import List, Dict
@@ -173,3 +175,15 @@ def judge_winner(results: List[dict]) -> dict:
         "message": msg,
         "evidence": evidence
     }
+
+async def run_arena_comparison(
+    models: list[str],
+    session: aiohttp.ClientSession,
+    prompt: str = None
+) -> dict:
+    """Оборачивает сравнение моделей и добавляет время выполнения."""
+    start = time.time()
+    result = await compare_models(models, session, prompt)
+    elapsed = time.time() - start
+    result["elapsed"] = round(elapsed, 2)
+    return result

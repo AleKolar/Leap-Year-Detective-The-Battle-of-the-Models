@@ -4,8 +4,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import aiohttp
 import logging
+
+from sqlalchemy import text
 from starlette.staticfiles import StaticFiles
 
+from src.database.database import engine
 from src.routers import leap_year, llm_arena
 from src.services.ai_service import API_KEY
 
@@ -18,8 +21,6 @@ async def lifespan(app: FastAPI):
         timeout=aiohttp.ClientTimeout(total=30),
         headers={"User-Agent": "LeapYearDetective/3.0"}
     )
-    app.state.arena_last_results = []
-
     # ── Блок проверки AI-сервиса ──
     if not API_KEY:
         logger.warning("⚠️ OPENROUTER_API_KEY не задан. LLM Arena будет недоступна.")
@@ -37,6 +38,13 @@ async def lifespan(app: FastAPI):
                     logger.warning(f"⚠️ OpenRouter вернул статус {resp.status}")
         except Exception as e:
             logger.warning(f"⚠️ Не удалось проверить OpenRouter: {e}")
+    try:
+        with engine.connect() as connection:
+            result = connection.execute(text("SELECT 1"))
+            logger.info(f"✅ Соединение с БД установлено: {result.scalar()}")
+    except Exception as e:
+        logger.warning(f"⚠️ Не удалось подключиться к БД: {e}")
+
 
     yield
 
