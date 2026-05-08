@@ -62,3 +62,5 @@ def test_winner_endpoint(client):
 def test_list_models(client):
     resp = client.get("/api/llm-arena/models")
     assert "deepseek-chat" in resp.json()
+
+# pytest tests/test_main.py
