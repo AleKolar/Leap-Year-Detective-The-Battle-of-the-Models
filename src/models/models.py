@@ -12,6 +12,7 @@ class ModelEvidence(BaseModel):
     model: str
     found_rule: bool
     snippet: str = ""
+    status: str = "success"
     num_asserts: int = 0
     has_1900: bool = False
     has_2000: bool = False

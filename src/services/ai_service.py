@@ -126,15 +126,39 @@ def judge_winner(results: List[dict]) -> dict:
     for res in results:
         code = res.get("content", "")
         model = res.get("model", "unknown")
+        status = res.get("status", "success")
+
+        # Если модель вернула ошибку – сразу в проигравшие, без анализа правила
+        if status == "error":
+            evidence.append({
+                "model": model,
+                "found_rule": False,
+                "snippet": "",
+                "status": "error",
+                "num_asserts": 0,
+                "coverage_points": 0,
+                "has_assert_messages": False,
+                "has_1900": False,
+                "has_2000": False,
+                "has_2100": False,
+                "has_negative": False,
+                "has_typical_leap": False,
+                "has_typical_common": False,
+            })
+            losers.append(model)
+            continue
+
+        # Нормальный ответ – анализируем правило и тесты
         match = pattern.search(code)
         found_rule = bool(match)
         snippet = match.group(0) if match else ""
-        test_stats = analyze_tests(code)
+        test_stats = analyze_tests(code)  # функция возвращает dict с ключами: num_asserts, coverage_points, has_*, ...
 
         evidence.append({
             "model": model,
             "found_rule": found_rule,
             "snippet": snippet,
+            "status": "success",
             **test_stats
         })
 
@@ -143,6 +167,7 @@ def judge_winner(results: List[dict]) -> dict:
         else:
             losers.append(model)
 
+    # Определение победителя
     if not winners:
         msg = f"😞 Все проиграли: {', '.join(losers)}. Никто не учёл правило 400."
         final_winners = []
@@ -150,9 +175,8 @@ def judge_winner(results: List[dict]) -> dict:
         msg = f"🏆 Победитель: {winners[0]}! Учтено правило 400."
         final_winners = [winners[0]]
     else:
-        # Ничья по функции – сравниваем тесты
+        # Ничья по функции – сравниваем качество тестов
         winner_ev = [e for e in evidence if e["model"] in winners]
-        # Сортировка: сначала по coverage_points (больше – лучше), потом по стилю
         best = sorted(winner_ev, key=lambda e: (
             e["coverage_points"],
             e["has_assert_messages"],
