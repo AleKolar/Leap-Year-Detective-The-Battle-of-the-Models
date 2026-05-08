@@ -1,23 +1,33 @@
 # src/database/database.py
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./arena_history.db"
+# Синхронный движок – исключительно для Alembic и тестов
+SYNC_DATABASE_URL = "sqlite:///./arena_history.db"
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
+sync_engine = create_engine(
+    SYNC_DATABASE_URL,
     connect_args={"check_same_thread": False}
 )
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+# Асинхронный движок – для приложения
+ASYNC_DATABASE_URL = "sqlite+aiosqlite:///./arena_history.db"
+async_engine = create_async_engine(
+    ASYNC_DATABASE_URL,
+    echo=False,
+)
+
+AsyncSessionLocal = async_sessionmaker(
+    bind=async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
 class Base(DeclarativeBase):
     pass
 
-def get_db():
+async def get_async_db():
     """Dependency для получения сессии в эндпоинтах."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    async with AsyncSessionLocal() as session:
+        yield session

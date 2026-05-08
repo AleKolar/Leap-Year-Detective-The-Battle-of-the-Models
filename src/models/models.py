@@ -1,4 +1,6 @@
 # src/models/models.py
+from datetime import datetime
+
 from pydantic import BaseModel
 from typing import Optional
 
@@ -25,3 +27,14 @@ class WinnerResponse(BaseModel):
     losers: list[str]
     message: str
     evidence: list[ModelEvidence] = []
+
+class BattleHistoryResponse(BaseModel):
+    id: int
+    model1: str
+    model2: str
+    winner: Optional[str] = None
+    message: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
