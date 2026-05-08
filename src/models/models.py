@@ -1,7 +1,7 @@
 # src/models/models.py
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 
 class CompareRequest(BaseModel):
@@ -30,6 +30,8 @@ class WinnerResponse(BaseModel):
     evidence: list[ModelEvidence] = []
 
 class BattleHistoryResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True) # теперь так !
+
     id: int
     model1: str
     model2: str
@@ -37,5 +39,5 @@ class BattleHistoryResponse(BaseModel):
     message: str
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    # class Config:
+    #     from_attributes = True # Устарел --> Предупреждение !
