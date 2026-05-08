@@ -212,3 +212,4 @@ async def run_arena_comparison(
     elapsed = time.time() - start
     result["elapsed"] = round(elapsed, 2)
     return result
+

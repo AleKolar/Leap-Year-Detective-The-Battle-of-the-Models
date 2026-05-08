@@ -187,12 +187,17 @@ Leap-Year-Detective/
 │   │   └── llm_arena.py       # Эндпоинты арены LLM (асинхронная БД)
 │   ├── services/
 │   │   ├── leap_year_service.py  # Бизнес-логика високосного года
-│   │   └── ai_service.py         # OpenRouter, сравнение, судья
+│   │   ├── ai_service.py         # OpenRouter, сравнение, судья
+│   │   └── arena_result.py       # 🔥 Работа с результатом последней битвы (DB service)
 │   ├── models/
-│   │   ├── models.py          # Pydantic-схемы
-│   │   └── db_models.py       # SQLAlchemy ORM модели
+│   │   ├── models.py          # Pydantic-схемы (legacy / internal models)
+│   │   └── db_models.py       # SQLAlchemy ORM модели (ArenaResult и др.)
+│   ├── schemas/
+│   │   └── schemas.py         # Pydantic схемы (request/response слой API)
 │   ├── database/
-│   │   └── database.py        # Асинхронный движок, синхронный для Alembic
+│   │   └── database.py        # Асинхронный движок, сессии, Alembic support
+│   ├── utils/
+│   │   └── normalize.py      # 🔧 normalize_evidence (переносы, форматирование)
 │   ├── templates/
 │   │   └── index.html
 │   ├── static/                # favicon.ico
