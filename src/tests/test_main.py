@@ -9,13 +9,12 @@ from src.database.database import get_async_db
 @pytest.fixture
 def client():
     """Фикстура TestClient с заменой зависимости БД на мок."""
-    async def override_get_async_db():
+    def override_get_async_db():
         session = AsyncMock()
-        # Настраиваем стандартное поведение методов, чтобы они были awaitable
         session.execute = AsyncMock()
         session.commit = AsyncMock()
         session.refresh = AsyncMock()
-        session.add = MagicMock() # синхронный, чтобы не было незавершённой корутины
+        session.add = MagicMock()
         yield session
 
     app.dependency_overrides[get_async_db] = override_get_async_db
@@ -103,16 +102,28 @@ def test_winner_endpoint(client):
     assert "B" in data["losers"]
     assert "Победитель" in data["message"]
 
-# !!! ВАЖНО: Определить, что мокать !!!
-# В production эндпоинт через Depends(get_async_db) получает настоящий AsyncSession,
-# созданный фабрикой AsyncSessionLocal. В тестах мы подменяем саму функцию-зависимость get_async_db,
-# но при каждом запросе FastAPI заново вызывает её и получает новый генератор, а значит,
-# и новый мок-объект — поэтому настройки, сделанные на одном экземпляре, не применялись к тому,
-# который приходит в эндпоинт. Решение: заменить зависимость на генератор, который всегда возвращает
-# один и тот же объект сессии с уже настроенным поведением (execute → scalar → нужный результат).
-# Так эндпоинт гарантированно получает подготовленный мок.
-# Коротко: мы не мокаем весь AsyncSessionLocal, а подменяем генератор сессии,
-# чтобы он выдавал конкретный экземпляр с нужным ответом — сам эндпоинт declare_winner остаётся
-# без изменений и просто получает этот мок через Depends(get_async_db).
+# !!! ВАЖНО: стратегия мокирования зависимости БД !!!
+
+# В production эндпоинты через Depends(get_async_db) получают настоящий AsyncSession,
+# создаваемый через AsyncSessionLocal (фабрику SQLAlchemy).
+
+# В тестах мы подменяем dependency get_async_db, чтобы не использовать реальную БД.
+
+# Важно: FastAPI вызывает dependency заново при каждом запросе, поэтому каждый вызов
+# override-функции создаёт новый объект сессии (новый AsyncMock).
+
+# Если настраивать мок вне override-функции или пытаться переиспользовать один экземпляр,
+# тесты могут получить другой инстанс сессии, не содержащий нужной конфигурации.
+
+# Решение: dependency override должен возвращать заранее сконфигурированный mock-сессионный объект
+# внутри генератора, чтобы именно он использовался в обработчике запроса.
+
+# Таким образом:
+# - мы НЕ мокируем AsyncSessionLocal целиком
+# - мы подменяем dependency get_async_db
+# - каждый запрос получает преднастроенный экземпляр session mock
+
+# Это гарантирует, что эндпоинт (например, declare_winner) работает с ожидаемым
+# поведением session.execute / scalar / commit без доступа к реальной БД.
 
 # pytest src/tests/test_main.py -v
