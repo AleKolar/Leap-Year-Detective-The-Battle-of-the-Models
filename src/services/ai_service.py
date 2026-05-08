@@ -9,16 +9,9 @@ load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
 
 AVAILABLE_MODELS = {
-    # Сильные
-    "gemma-4-26b": "google/gemma-4-26b-a4b-it:free",
-    "nemotron-3": "nvidia/nemotron-3-super:free",
-
-    # Средние
-    "qwen3.5-flash": "qwen/qwen3.5-flash:free",
-    "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct:free",
-
-    # Вроде бы слабая модель
-    "nemotron-embed": "nvidia/llama-nemotron-embed-vl-1b-v2:free",
+    "gpt-4o-mini": "openai/gpt-4o-mini",
+    "deepseek-chat": "deepseek/deepseek-chat",
+    "llama-3.1-8b": "meta-llama/llama-3.1-8b-instruct",
 }
 
 DEFAULT_MODELS = ["gpt-4o-mini", "deepseek-chat"]
