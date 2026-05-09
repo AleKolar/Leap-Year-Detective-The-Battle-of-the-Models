@@ -296,6 +296,7 @@ text
 Leap-Year-Detective/
 ├── .env
 ├── .gitignore
+├── pyproject.toml          # ⚙️ Конфигурация Ruff / Pytest / Coverage
 ├── requirements.txt
 ├── main.py                    # Точка входа, lifespan, шаблоны
 ├── alembic.ini                # Конфигурация Alembic
