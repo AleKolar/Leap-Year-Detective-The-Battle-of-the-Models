@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 
+from src.models.models import YearCheckResponse
 from src.services.leap_year_service import (
     get_celebrity,
     get_stats,
@@ -11,12 +11,13 @@ from src.services.leap_year_service import (
 
 router = APIRouter(tags=["Leap Year"])
 
-@router.get("/api/check/{year}")
+@router.get("/api/check/{year}", response_model=YearCheckResponse)
 async def check_year(year: int):
     leap = is_leap_year(year)
     description = get_year_description(year)
     record_check(year, leap)
-    return JSONResponse({
+
+    return {
         "year": year,
         "is_leap": leap,
         "description": description,
@@ -28,7 +29,7 @@ async def check_year(year: int):
             "divisible_by_400": year % 400 == 0,
             "exception_handled": True
         }
-    })
+    }
 
 @router.get("/api/stats")
 async def stats():

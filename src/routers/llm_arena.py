@@ -67,9 +67,6 @@ async def declare_winner(
         raise HTTPException(400, "Некорректные данные битвы в БД")
 
     decision = judge_winner(results)
-    # Сохраняем проанализированные evidence в БД
-    analyzed = [ModelEvidence(**e).model_dump() for e in decision["evidence"]]
-    last_battle.evidence = analyzed
 
     last_battle.winner = decision["winners"][0] if decision["winners"] else "draw"
     last_battle.message = decision["message"]

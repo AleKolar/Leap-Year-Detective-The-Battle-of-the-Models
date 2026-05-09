@@ -38,7 +38,18 @@ class BattleHistoryResponse(BaseModel):
     message: str
     created_at: datetime
 
-    model_config = ConfigDict(from_attributes=True)  # теперь так !
+    model_config = ConfigDict(from_attributes=True)
 
-    # class Config:
-    #     from_attributes = True # Устарел --> Предупреждение !
+class RuleCheckSchema(BaseModel):
+    divisible_by_4: bool
+    divisible_by_100: bool
+    divisible_by_400: bool
+    exception_handled: bool = True
+
+class YearCheckResponse(BaseModel):
+    year: int
+    is_leap: bool
+    description: str
+    days: int
+    celebrity: str | None = None
+    rule_check: RuleCheckSchema
