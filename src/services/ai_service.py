@@ -3,6 +3,7 @@ import asyncio
 import os
 import re
 import time
+from pathlib import Path
 
 import aiohttp
 from dotenv import load_dotenv
@@ -26,11 +27,15 @@ AVAILABLE_MODELS = {
 
 DEFAULT_MODELS = ["gpt-4o-mini", "deepseek-chat"]
 
-SYSTEM_PROMPT = """
-Сгенерируй короткую Python-функцию, которая проверяет, является ли введенный год високосным.
-Также напиши автотесты на pytest для проверки логики функции.
-Не используй markdown. Верни только Python-код.
-"""
+def load_prompt(filename: str) -> str:
+    """Читает промпт из файла в папке prompts."""
+    prompt_dir = Path(__file__).resolve().parent.parent / "prompts"
+    file_path = prompt_dir / filename
+    if not file_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {file_path}")
+    return file_path.read_text(encoding="utf-8").strip()
+
+SYSTEM_PROMPT = load_prompt("system_prompt.md")
 
 async def fetch_from_model(session: aiohttp.ClientSession, model_id: str, prompt: str) -> dict:
     if not API_KEY:
