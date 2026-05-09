@@ -211,4 +211,46 @@ def test_judge_winner_simple():
     assert "losers" in res
     assert "message" in res
 
+# =========================
+# TESTS: SCHEMAS
+# =========================
+
+from src.schemas.schemas import (
+    CompareRequest,
+    WinnerRequest,
+    ArenaResultResponse
+)
+from datetime import datetime
+
+
+def test_schemas_compare_request():
+    obj = CompareRequest(models=["gpt"], prompt="test")
+
+    assert obj.models == ["gpt"]
+    assert obj.prompt == "test"
+
+
+def test_schemas_winner_request():
+    obj = WinnerRequest(results=[{"model": "A"}])
+
+    assert obj.results[0]["model"] == "A"
+
+
+def test_schemas_arena_response():
+    obj = ArenaResultResponse(
+        id=1,
+        model1="a",
+        model2="b",
+        winner=None,
+        message="ok",
+        evidence=[],
+        created_at=datetime.now()
+    )
+
+    assert obj.model1 == "a"
+    assert obj.model2 == "b"
+
 # pytest src/tests/test_main.py -v
+# pytest --cov=src --cov-report=term-missing
+# pytest --cov=src --cov-report=xml
+

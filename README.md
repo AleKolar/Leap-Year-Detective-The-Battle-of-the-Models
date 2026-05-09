@@ -2,10 +2,31 @@
 
 **Leap Year Detective** — это интерактивное веб-приложение на FastAPI, которое объединяет две мощные функции:
 
+[![codecov](https://codecov.io/gh/AleKolar/Leap-Year-Detective-The-Battle-of-the-Models/graph/badge.svg?token=BSPH4PID5K)](https://codecov.io/gh/AleKolar/Leap-Year-Detective-The-Battle-of-the-Models)
+![CI](https://img.shields.io/badge/CI-passing-brightgreen)
+
 1. **Детектив високосного года** – проверяет любой год с учётом всех исторических правил григорианского календаря.
 2. **LLM Arena** – арена для сравнения больших языковых моделей (LLM), где они **без подсказок** пытаются реализовать функцию `is_leap_year` и написать к ней тесты.
 
 Победитель определяется автоматически: рефери проверяет, знает ли модель исключение «годы, кратные 400», а при ничьей анализирует качество написанных тестов.
+
+## 📊 CI / Coverage
+
+Проект использует **GitHub Actions CI**, который автоматически:
+
+- запускает тесты (`pytest`)
+- считает coverage (`pytest-cov`)
+- проверяет API и бизнес-логику
+- валидирует LLM Arena (mocked OpenRouter)
+- блокирует merge при падении тестов
+
+### 🔧 CI включает:
+
+- 🧪 unit + integration tests  
+- 🤖 mocked LLM API  
+- 🗄️ mocked Async DB (SQLAlchemy)  
+- 📊 coverage report  
+- ⚡ запуск на push и PR  
 
 ---
 
@@ -144,6 +165,7 @@
 | Уровень | Что проверяется |
 |--------|----------------|
 | Unit | бизнес-логика (leap year rules) |
+| Schema | Pydantic модели (валидация вход/выход, API контракт) |
 | API | FastAPI endpoints |
 | Integration | LLM Arena + mocked OpenRouter |
 | Infrastructure mock | Async DB session |
@@ -245,7 +267,9 @@ uvicorn main:app --reload
 
 ### 5. Запуск тестов
 ```bash
-pytest src/tests/test_main.py -v
+pytest src/tests/test_main.py -v 
+ 
+pytest --cov=src --cov-report=term-missing # с покрытием
 ```
 
 ---
