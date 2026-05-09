@@ -125,11 +125,11 @@
 # 🎬 Project Demo
 <div style="text-align: center; background: #f0f8ff; border: 2px solid #007bff; padding: 15px; border-radius: 10px;">
   <h3>🎥 Live demo</h3>
-  <p><i>Ниже анимированный предпросмотр. <a href="screenshots/walkthrough.mp4">Открыть видео</a></i></p>
+  <p><i>Ниже анимированный предпросмотр.</i></p>
   <img src="screenshots/walkthrough.gif" alt="Demo" width="720" style="border: 1px solid #ddd; border-radius: 4px;">
 </div>
 
-[![▶ Демонстрация работы](https://img.shields.io/badge/▶_Демонстрация-Смотреть_видео-2ea44f?style=for-the-badge&logo=github)](screenshots/walkthrough.mp4)
+[![▶ Демонстрация работы](https://img.shields.io/badge/▶_Демонстрация-Скачать_видео-2ea44f?style=for-the-badge&logo=github)](screenshots/walkthrough.mp4)
 
 ## 🧠 LLM Battle Results
 
