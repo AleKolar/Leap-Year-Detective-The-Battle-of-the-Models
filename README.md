@@ -125,7 +125,7 @@
 # 🎬 Project Demo
 <div style="text-align: center; background: #f0f8ff; border: 2px solid #007bff; padding: 15px; border-radius: 10px;">
   <h3>🎥 Live demo</h3>
-  <p><i>Ниже анимированный предпросмотр.</i></p>
+  <p><i>Вот так это работает</i></p>
   <img src="screenshots/walkthrough.gif" alt="Demo" width="720" style="border: 1px solid #ddd; border-radius: 4px;">
 </div>
 
