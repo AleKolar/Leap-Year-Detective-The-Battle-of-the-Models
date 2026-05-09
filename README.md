@@ -123,18 +123,20 @@
 }
 ```
 # 🎬 Project Demo
-<div style="text-align: center; background: #f0f8ff; border: 2px solid #007bff; padding: 15px; border-radius: 10px;">
-  <h3>🎥 Live demo</h3>
-  <p><i>Вот так это работает</i></p>
-  <img src="screenshots/walkthrough.gif" alt="Demo" width="720" style="border: 1px solid #ddd; border-radius: 4px;">
-</div>
+<table align="center" border="2" bordercolor="#007bff" cellpadding="15" bgcolor="#f0f8ff">
+  <tr><td>
+    <h3>🎥 Live demo</h3>
+    <p><i>Вот так это работает</i></p>
+    <img src="screenshots/walkthrough.gif" alt="Demo" width="720" style="border: 1px solid #ddd; border-radius: 4px;">
+  </td></tr>
+</table>
 
 [![▶ Демонстрация работы](https://img.shields.io/badge/▶_Демонстрация-Скачать_видео-2ea44f?style=for-the-badge&logo=github)](screenshots/walkthrough.mp4)
 
 ## 🧠 LLM Battle Results
 
 ![battle1](screenshots/battle1.jpg)
-![battle2](screenshots/battle2.jpg)
+<!-- ![battle2](screenshots/battle2.jpg) -->
 ![battle3](screenshots/battle3.jpg)
 
 ---
