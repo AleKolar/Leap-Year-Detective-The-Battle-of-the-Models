@@ -185,14 +185,14 @@
 | Integration | LLM Arena + mocked OpenRouter |
 | Infrastructure mock | Async DB session |
 
-### 🚀 Запуск тестов
+## 🚀 Запуск тестов
 
 ```bash
 pytest src/tests -v
 
 ---
 
-## 🧠 Как это работает
+### 🧠 Как это работает
 
 ### Проверка года
 Эндпоинт `/api/check/{year}` принимает целое число и возвращает JSON с вердиктом, описанием и статистикой. Вся логика вынесена в слой сервисов (`services/leap_year_service.py`).
