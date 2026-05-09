@@ -185,7 +185,7 @@
 | Integration | LLM Arena + mocked OpenRouter |
 | Infrastructure mock | Async DB session |
 
-## 🚀 Запуск тестов
+### 🚀 Запуск тестов
 
 ```bash
 pytest src/tests -v
