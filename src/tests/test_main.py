@@ -1,4 +1,5 @@
 import pytest
+from datetime import datetime
 from unittest.mock import patch, AsyncMock, MagicMock
 from fastapi.testclient import TestClient
 
@@ -8,6 +9,12 @@ from src.database.database import get_async_db
 from src.utils.normalize import normalize_evidence, to_md
 from src.services.arena_result import get_last_result_service
 from src.services.ai_service import judge_winner
+from src.schemas.schemas import (
+    CompareRequest,
+    WinnerRequest,
+    ArenaResultResponse
+)
+
 
 
 # =========================
@@ -214,14 +221,6 @@ def test_judge_winner_simple():
 # =========================
 # TESTS: SCHEMAS
 # =========================
-
-from src.schemas.schemas import (
-    CompareRequest,
-    WinnerRequest,
-    ArenaResultResponse
-)
-from datetime import datetime
-
 
 def test_schemas_compare_request():
     obj = CompareRequest(models=["gpt"], prompt="test")
