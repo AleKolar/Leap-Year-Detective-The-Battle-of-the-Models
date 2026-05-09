@@ -2,11 +2,11 @@
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+
 
 class CompareRequest(BaseModel):
-    models: Optional[list[str]] = None
-    prompt: Optional[str] = None
+    models: list[str] | None = None
+    prompt: str | None = None
 
 class ModelEvidence(BaseModel):
     model: str
@@ -34,7 +34,7 @@ class BattleHistoryResponse(BaseModel):
     id: int
     model1: str
     model2: str
-    winner: Optional[str] = None
+    winner: str | None = None
     message: str
     created_at: datetime
 

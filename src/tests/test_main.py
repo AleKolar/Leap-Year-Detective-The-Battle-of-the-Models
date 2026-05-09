@@ -1,21 +1,16 @@
-import pytest
 from datetime import datetime
-from unittest.mock import patch, AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 from fastapi.testclient import TestClient
 
 from main import app
-from src.services.leap_year_service import is_leap_year
 from src.database.database import get_async_db
-from src.utils.normalize import normalize_evidence, to_md
-from src.services.arena_result import get_last_result_service
+from src.schemas.schemas import ArenaResultResponse, CompareRequest, WinnerRequest
 from src.services.ai_service import judge_winner
-from src.schemas.schemas import (
-    CompareRequest,
-    WinnerRequest,
-    ArenaResultResponse
-)
-
-
+from src.services.arena_result import get_last_result_service
+from src.services.leap_year_service import is_leap_year
+from src.utils.normalize import normalize_evidence, to_md
 
 # =========================
 # FIXTURE

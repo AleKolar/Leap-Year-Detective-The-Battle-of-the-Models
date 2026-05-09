@@ -1,8 +1,12 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
+
 from src.services.leap_year_service import (
-    is_leap_year, get_year_description, record_check,
-    get_stats, get_celebrity
+    get_celebrity,
+    get_stats,
+    get_year_description,
+    is_leap_year,
+    record_check,
 )
 
 router = APIRouter(tags=["Leap Year"])

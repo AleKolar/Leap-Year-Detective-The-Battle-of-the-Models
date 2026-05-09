@@ -1,13 +1,13 @@
 # src/schemas/schemas.py
 from datetime import datetime
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, Any
 
 
 class CompareRequest(BaseModel):
-    models: Optional[list[str]] = None
-    prompt: Optional[str] = None
+    models: list[str] | None = None
+    prompt: str | None = None
 
 class WinnerRequest(BaseModel):
     results: list[dict]

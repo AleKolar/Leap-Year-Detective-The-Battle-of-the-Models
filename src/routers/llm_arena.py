@@ -1,17 +1,18 @@
 # src/routers/llm_arena.py
 
-from fastapi import APIRouter, Request, HTTPException, Depends, Response
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-
-from src.models.db_models import ArenaResult
-from src.models.models import CompareRequest, WinnerResponse, BattleHistoryResponse
-from src.services.ai_service import (
-    run_arena_comparison, judge_winner,
-    DEFAULT_MODELS, AVAILABLE_MODELS
-)
 from src.database.database import get_async_db
+from src.models.db_models import ArenaResult
+from src.models.models import BattleHistoryResponse, CompareRequest, WinnerResponse
+from src.services.ai_service import (
+    AVAILABLE_MODELS,
+    DEFAULT_MODELS,
+    judge_winner,
+    run_arena_comparison,
+)
 from src.services.arena_result import get_last_result_service
 from src.utils.normalize import normalize_evidence, to_md
 

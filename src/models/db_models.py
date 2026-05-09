@@ -1,5 +1,5 @@
 # src/models/db_models.py
-from sqlalchemy import Column, Integer, String, JSON, DateTime, func
+from sqlalchemy import JSON, Column, DateTime, Integer, String, func
 
 from src.database.database import Base
 

@@ -1,12 +1,11 @@
 # src/services/ai_service.py
+import asyncio
 import os
 import re
-import asyncio
 import time
 
 import aiohttp
 from dotenv import load_dotenv
-from typing import List, Dict
 
 load_dotenv()
 API_KEY = os.getenv("OPENROUTER_API_KEY")
@@ -69,10 +68,10 @@ async def fetch_from_model(session: aiohttp.ClientSession, model_id: str, prompt
         return {"model": model_id, "content": f"Исключение: {str(e)}", "status": "error"}
 
 async def compare_models(
-    models: List[str],
+    models: list[str],
     session: aiohttp.ClientSession,
     custom_prompt: str = None
-) -> Dict:
+) -> dict:
     prompt = custom_prompt or SYSTEM_PROMPT
     selected_ids = [AVAILABLE_MODELS[m] for m in models if m in AVAILABLE_MODELS]
     if not selected_ids:
@@ -119,7 +118,7 @@ def analyze_tests(code: str) -> dict:
     }
 
 
-def judge_winner(results: List[dict]) -> dict:
+def judge_winner(results: list[dict]) -> dict:
     winners, losers = [], []
     evidence = []
     pattern = re.compile(r'(year\s*%\s*400\s*==\s*0|not\s+year\s*%\s*400|year\s*%\s*400\b)')

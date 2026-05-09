@@ -1,6 +1,6 @@
 # src/database/database.py
 from sqlalchemy import create_engine
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 # Синхронный движок – исключительно для Alembic и тестов

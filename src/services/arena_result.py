@@ -1,7 +1,8 @@
 # src/services/arena_result.py
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models.db_models import ArenaResult
 
 

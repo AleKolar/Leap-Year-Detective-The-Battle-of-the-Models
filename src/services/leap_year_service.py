@@ -1,8 +1,7 @@
 from datetime import datetime
-from typing import Dict, Optional
 
 # Хранилище статистики (глобальное, можно заменить на БД)
-stats: Dict = {
+stats: dict = {
     "total_checks": 0,
     "leap_count": 0,
     "common_count": 0,
@@ -46,8 +45,8 @@ def record_check(year: int, leap: bool) -> None:
     if len(stats["recent_years"]) > 10:
         stats["recent_years"].pop(0)
 
-def get_stats() -> Dict:
+def get_stats() -> dict:
     return stats
 
-def get_celebrity(year: int) -> Optional[str]:
+def get_celebrity(year: int) -> str | None:
     return stats["celebrity_birthdays"].get(year)
