@@ -40,6 +40,7 @@
 - FastAPI
 - SQLAlchemy Async
 - SQLite
+- Alembic (database migrations)
 - aiohttp
 - Jinja2
 - Pytest
@@ -52,17 +53,15 @@
 
 ## 🏗️ Architecture
 
-Проект использует layered architecture и separation of concerns:
+Проект использует layered architecture и придерживается принципа separation of concerns:
 
 - routers → thin FastAPI HTTP/API controllers
 - services → business logic and orchestration
 - schemas → Pydantic request/response schemas (API contract layer)
 - models/db_models.py → SQLAlchemy ORM models only
-- database → async DB engine and session management
+- database → async DB engine, session management, and Alembic migrations
 - utils → formatting and normalization helpers
 - tests → unit/integration tests with mocked infrastructure
-
----
 
 ## 📦 Что умеет проект
 
