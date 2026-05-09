@@ -52,14 +52,15 @@
 
 ## 🏗️ Architecture
 
-Проект использует layered architecture:
+Проект использует layered architecture и separation of concerns:
 
-- routers → HTTP/API layer
-- services → business logic
-- schemas → request/response validation
-- database → async DB layer
-- utils → formatting helpers
-- tests → unit/integration tests
+- routers → thin FastAPI HTTP/API controllers
+- services → business logic and orchestration
+- schemas → Pydantic request/response schemas (API contract layer)
+- models/db_models.py → SQLAlchemy ORM models only
+- database → async DB engine and session management
+- utils → formatting and normalization helpers
+- tests → unit/integration tests with mocked infrastructure
 
 ---
 
