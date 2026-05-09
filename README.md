@@ -189,6 +189,7 @@
 
 ```bash
 pytest src/tests -v
+```
 
 ---
 
@@ -226,7 +227,7 @@ AVAILABLE_MODELS = {
     "gpt-4o-mini": "openai/gpt-4o-mini",
     "deepseek-chat": "deepseek/deepseek-chat",
     # ... существующие модели ...
-    "ваш-ключ": "полный/идентификатор/модели:free",  # ← добавьте сюда
+    "ваш-ключ": "полный/идентификатор/модели:free",  
 }
 
 ```
