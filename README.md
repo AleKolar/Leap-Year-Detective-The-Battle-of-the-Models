@@ -124,6 +124,8 @@
 ```
 # 🎬 Project Demo
 
+[![▶ Демонстрация работы](https://img.shields.io/badge/▶_Демонстрация-Смотреть_видео-2ea44f?style=for-the-badge&logo=github)](screenshots/walkthrough.mp4)
+
 ## 🧠 LLM Battle Results
 
 ![battle1](screenshots/battle1.jpg)
