@@ -88,6 +88,21 @@
   "created_at": "2026-05-08T17:38:44"
 }
 ```
+# 🎬 Project Demo
+
+## 🧠 LLM Battle Results
+
+![battle1](screenshots/battle1.jpg)
+![battle2](screenshots/battle2.jpg)
+![battle3](screenshots/battle3.jpg)
+
+---
+
+## 📄 Downloaded Result File Example
+
+![download](screenshots/download.jpg)
+
+---
 
 ## 🧪 Автотесты (pytest)
 
