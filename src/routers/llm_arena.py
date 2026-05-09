@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.database import get_async_db
 from src.models.db_models import ArenaResult
-from src.models.models import BattleHistoryResponse, CompareRequest, WinnerResponse
+from src.models.models import BattleHistoryResponse, CompareRequest, WinnerResponse, ModelEvidence
 from src.services.ai_service import (
     AVAILABLE_MODELS,
     DEFAULT_MODELS,
@@ -67,21 +67,21 @@ async def declare_winner(
         raise HTTPException(400, "Некорректные данные битвы в БД")
 
     decision = judge_winner(results)
+    # Сохраняем проанализированные evidence в БД
+    analyzed = [ModelEvidence(**e).model_dump() for e in decision["evidence"]]
+    last_battle.evidence = analyzed
+
+    last_battle.winner = decision["winners"][0] if decision["winners"] else "draw"
+    last_battle.message = decision["message"]
+    await db.commit()
+
     last_battle.winner = decision["winners"][0] if decision["winners"] else "draw"
     last_battle.message = decision["message"]
     await db.commit()
 
     return WinnerResponse(**decision)
 
-# @router.get("/history")
-# async def get_history(db: AsyncSession = Depends(get_async_db)):
-#     stmt = select(ArenaResult).order_by(ArenaResult.id.desc()).limit(10)
-#     result = await db.execute(stmt)
-#     battles = result.scalars().all()
-#     return battles
 
-
-# с моделью BattleHistoryResponse - только нужные поля, без утечки и контракт API
 @router.get("/history", response_model=list[BattleHistoryResponse])
 async def get_history(db: AsyncSession = Depends(get_async_db)):
     stmt = select(ArenaResult).order_by(ArenaResult.id.desc()).limit(10)
@@ -89,14 +89,6 @@ async def get_history(db: AsyncSession = Depends(get_async_db)):
     battles = result.scalars().all()
     return battles
 
-# @router.get("/last-result")
-# async def get_last_result(db: AsyncSession = Depends(get_async_db)):
-#     last_battle = await get_last_result_service(db)
-#
-#     if not last_battle:
-#         raise HTTPException(404, "История битв пуста")
-#
-#     return last_battle
 
 @router.get("/last-result")
 async def get_last_result(db: AsyncSession = Depends(get_async_db)):
