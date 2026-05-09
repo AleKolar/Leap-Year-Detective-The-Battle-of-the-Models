@@ -5,13 +5,20 @@ from fastapi.testclient import TestClient
 from main import app
 from src.services.leap_year_service import is_leap_year
 from src.database.database import get_async_db
+from src.utils.normalize import normalize_evidence, to_md
+from src.services.arena_result import get_last_result_service
+from src.services.ai_service import judge_winner
 
+
+# =========================
+# FIXTURE
+# =========================
 
 @pytest.fixture
 def client():
     """Фикстура TestClient с заменой зависимости БД на мок."""
 
-    def override_get_async_db():
+    async def override_get_async_db():
         session = AsyncMock()
         session.execute = AsyncMock()
         session.commit = AsyncMock()
@@ -24,6 +31,10 @@ def client():
         yield c
     app.dependency_overrides.clear()
 
+
+# =========================
+# TESTS: CORE LOGIC
+# =========================
 
 @pytest.mark.parametrize("year,expected", [
     (2024, True), (2000, True), (0, True), (-400, True),
@@ -59,15 +70,23 @@ def test_main_page(client):
     assert "Leap Year Detective" in resp.text
 
 
+# =========================
+# TESTS: LLM ARENA
+# =========================
+
 @pytest.mark.asyncio
 async def test_compare_models(client):
     with patch("src.services.ai_service.fetch_from_model") as mock_fetch:
         mock_fetch.side_effect = [
-            {"model": "openai/gpt-4o-mini", "content": "def is_leap(y): return y%4==0 and (y%100!=0 or y%400==0)",
-             "status": "success"},
+            {"model": "openai/gpt-4o-mini", "content": "def is_leap(y): return y%4==0 and (y%100!=0 or y%400==0)", "status": "success"},
             {"model": "deepseek/deepseek-chat", "content": "def is_leap(y): return y%4==0", "status": "success"},
         ]
-        resp = client.post("/api/llm-arena/compare", json={"models": ["gpt-4o-mini", "deepseek-chat"]})
+
+        resp = client.post(
+            "/api/llm-arena/compare",
+            json={"models": ["gpt-4o-mini", "deepseek-chat"]}
+        )
+
         assert resp.status_code == 200
         data = resp.json()
         assert len(data["results"]) == 2
@@ -80,7 +99,6 @@ def test_list_models(client):
 
 
 def test_winner_endpoint(client):
-    # Готовим замоканную битву, которую вернёт scalar()
     mock_battle = MagicMock()
     mock_battle.evidence = [
         {"model": "A", "content": "def f(): return year % 400 == 0", "status": "success"},
@@ -92,7 +110,6 @@ def test_winner_endpoint(client):
     mock_result = MagicMock()
     mock_result.scalar.return_value = mock_battle
 
-    # Создаём специальную зависимость для этого теста
     async def override_for_winner():
         session = AsyncMock()
         session.execute = AsyncMock(return_value=mock_result)
@@ -101,7 +118,6 @@ def test_winner_endpoint(client):
         session.add = MagicMock()
         yield session
 
-    # Подменяем зависимость перед вызовом эндпоинта
     app.dependency_overrides[get_async_db] = override_for_winner
 
     resp = client.post("/api/llm-arena/winner")
@@ -111,28 +127,88 @@ def test_winner_endpoint(client):
     assert "B" in data["losers"]
     assert "Победитель" in data["message"]
 
-# !!! ВАЖНО: стратегия мокирования зависимости БД !!!
 
-# В production эндпоинты через Depends(get_async_db) получают настоящий AsyncSession,
-# создаваемый через AsyncSessionLocal (фабрику SQLAlchemy).
+# =========================
+# TESTS: UTILS
+# =========================
 
-# В тестах мы подменяем dependency get_async_db, чтобы не использовать реальную БД.
+def test_normalize_evidence_dict():
+    data = [{"model": "gpt", "content": "code"}]
+    result = normalize_evidence(data)
 
-# Важно: FastAPI вызывает dependency заново при каждом запросе, поэтому каждый вызов
-# override-функции создаёт новый объект сессии (новый AsyncMock).
+    assert result[0]["model"] == "gpt"
+    assert result[0]["content"] == "code"
 
-# Если настраивать мок вне override-функции или пытаться переиспользовать один экземпляр,
-# тесты могут получить другой инстанс сессии, не содержащий нужной конфигурации.
 
-# Решение: dependency override должен возвращать заранее сконфигурированный mock-сессионный объект
-# внутри генератора, чтобы именно он использовался в обработчике запроса.
+def test_normalize_evidence_string():
+    data = ["hello"]
+    result = normalize_evidence(data)
 
-# Таким образом:
-# - мы НЕ мокируем AsyncSessionLocal целиком
-# - мы подменяем dependency get_async_db
-# - каждый запрос получает преднастроенный экземпляр session mock
+    assert result[0]["model"] == "unknown"
+    assert "hello" in result[0]["content"]
 
-# Это гарантирует, что эндпоинт (например, declare_winner) работает с ожидаемым
-# поведением session.execute / scalar / commit без доступа к реальной БД.
+
+def test_to_md():
+    data = [{"model": "gpt", "content": "print(1)"}]
+    md = to_md(data)
+
+    assert "gpt" in md
+    assert "```python" in md
+
+
+# =========================
+# TESTS: SERVICES
+# =========================
+
+@pytest.mark.asyncio
+async def test_get_last_result_service():
+    mock_result = MagicMock()
+    mock_result.scalars.return_value.first.return_value = "result"
+
+    db = AsyncMock()
+    db.execute.return_value = mock_result
+
+    result = await get_last_result_service(db)
+
+    assert result == "result"
+
+
+def test_last_result(client):
+    mock_battle = MagicMock()
+    mock_battle.evidence = []
+    mock_battle.message = "test"
+
+    mock_scalars = MagicMock()
+    mock_scalars.first.return_value = mock_battle
+
+    mock_result = MagicMock()
+    mock_result.scalars.return_value = mock_scalars
+
+    async def override_get_async_db():
+        session = AsyncMock()
+        session.execute = AsyncMock(return_value=mock_result)
+        session.commit = AsyncMock()
+        session.refresh = AsyncMock()
+        session.add = MagicMock()
+        yield session
+
+    app.dependency_overrides[get_async_db] = override_get_async_db
+
+    resp = client.get("/api/llm-arena/last-result")
+
+    assert resp.status_code in (200, 404)
+
+
+def test_judge_winner_simple():
+    results = [
+        {"model": "A", "content": "def f(): return True", "status": "success"},
+        {"model": "B", "content": "error", "status": "error"},
+    ]
+
+    res = judge_winner(results)
+
+    assert "winners" in res
+    assert "losers" in res
+    assert "message" in res
 
 # pytest src/tests/test_main.py -v
