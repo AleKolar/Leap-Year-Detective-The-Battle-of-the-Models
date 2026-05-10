@@ -359,6 +359,8 @@ Leap-Year-Detective/
 │   │   └── schemas.py         # Pydantic схемы (request/response слой API)
 │   ├── database/
 │   │   └── database.py        # Асинхронный движок, сессии, Alembic support
+│   ├── prompts/
+│   │   └── system_prompt.md        
 │   ├── utils/
 │   │   └── normalize.py      # 🔧 normalize_evidence (переносы, форматирование)
 │   ├── templates/
