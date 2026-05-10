@@ -360,9 +360,9 @@ Leap-Year-Detective/
 │   ├── database/
 │   │   └── database.py        # Асинхронный движок, сессии, Alembic support
 │   ├── prompts/
-│   │   └── system_prompt.md        
+│   │   └── system_prompt.md   # 🧠 Системный промпт для LLM: задание написать is_leap_year и тесты     
 │   ├── utils/
-│   │   └── normalize.py      # 🔧 normalize_evidence (переносы, форматирование)
+│   │   └── normalize.py       # 🔧 normalize_evidence (переносы, форматирование)
 │   ├── templates/
 │   │   └── index.html
 │   ├── static/                # favicon.ico
