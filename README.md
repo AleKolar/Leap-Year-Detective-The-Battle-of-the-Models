@@ -279,7 +279,7 @@ AVAILABLE_MODELS = {
 Внутри `<select id="model1">` и `<select id="model2">` добавьте новую опцию:
 
 ```html
-<option value="ваш-ключ">🟡 Название модели</option>
+<option value="имя модели" selected>🟡 Название модели</option>
 ```
 
 > **Важно:** Для бесплатных моделей ID должен заканчиваться на `:free`.  
