@@ -27,6 +27,9 @@ AsyncSessionLocal = async_sessionmaker(
 class Base(DeclarativeBase):
     pass
 
+# Алиас для Alembic (Alembic нуждается в синхронном engine)
+engine = sync_engine
+
 async def get_async_db():
     """Dependency для получения сессии в эндпоинтах."""
     async with AsyncSessionLocal() as session:
