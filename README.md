@@ -3,11 +3,11 @@
 **Leap Year Detective** — это интерактивное веб-приложение на FastAPI, которое объединяет две мощные функции:
 
 [![codecov](https://codecov.io/gh/AleKolar/Leap-Year-Detective-The-Battle-of-the-Models/graph/badge.svg?token=BSPH4PID5K)](https://codecov.io/gh/AleKolar/Leap-Year-Detective-The-Battle-of-the-Models)
-![CI](https://img.shields.io/badge/CI-passing-brightgreen)
+[![CI](https://github.com/AleKolar/Leap-Year-Detective-The-Battle-of-the-Models/actions/workflows/ci.yml/badge.svg)](https://github.com/AleKolar/Leap-Year-Detective-The-Battle-of-the-Models/actions/workflows/ci.yml)
 
 ![Python](https://img.shields.io/badge/python-3.12-blue)
 ![FastAPI](https://img.shields.io/badge/FastAPI-async-green)
-![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen)
+
 
 1. **Детектив високосного года** – проверяет любой год с учётом всех исторических правил григорианского календаря.
 2. **LLM Arena** – арена для сравнения больших языковых моделей (LLM), где они **без подсказок** пытаются реализовать функцию `is_leap_year` и написать к ней тесты.
